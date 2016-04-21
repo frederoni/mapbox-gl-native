@@ -17,6 +17,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
  */
 public class Marker extends Annotation {
 
+    private MarkerView markerView;
+
     private LatLng position;
     private String snippet;
     private Icon icon;
@@ -79,6 +81,10 @@ public class Marker extends Annotation {
         if (map != null) {
             map.updateMarker(this);
         }
+
+        if(markerView!=null){
+            markerView.setLatLng(position);
+        }
     }
 
     void setSnippet(String snippet) {
@@ -140,6 +146,19 @@ public class Marker extends Annotation {
             infoWindow = new InfoWindow(mapView, R.layout.infowindow_view, getMapboxMap());
         }
         return infoWindow;
+    }
+
+    public MarkerView getMarkerView() {
+        return markerView;
+    }
+
+    public void setMarkerView(MarkerView markerView) {
+        MapboxMap map = getMapboxMap();
+        if (map != null) {
+            this.markerView = markerView;
+            this.markerView.setLatLng(position);
+            map.addMarkerView(markerView);
+        }
     }
 
     /**
