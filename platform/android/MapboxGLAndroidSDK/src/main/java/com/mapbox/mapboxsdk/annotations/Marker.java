@@ -152,7 +152,7 @@ public class Marker extends Annotation {
         return markerView;
     }
 
-    public void setMarkerView(MarkerView markerView) {
+    void setMarkerView(MarkerView markerView) {
         MapboxMap map = getMapboxMap();
         if (map != null) {
             this.markerView = markerView;

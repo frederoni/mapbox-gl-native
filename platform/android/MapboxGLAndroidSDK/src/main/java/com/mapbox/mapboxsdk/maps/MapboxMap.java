@@ -64,6 +64,7 @@ public class MapboxMap {
     private List<InfoWindow> mInfoWindows;
 
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
+    private MapboxMap.MarkerViewAdapter mMarkerViewAdapter;
 
     private boolean mMyLocationEnabled;
     private boolean mAllowConcurrentMultipleInfoWindows;
@@ -651,6 +652,14 @@ public class MapboxMap {
     @NonNull
     public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
         Marker marker = prepareMarker(markerOptions);
+
+        if(mMarkerViewAdapter!=null){
+            MarkerView view = mMarkerViewAdapter.getView(marker);
+            if(view!=null) {
+                mMarkerViews.add(view);
+            }
+        }
+
         long id = mMapView.addMarker(marker);
         marker.setMapboxMap(this);
         marker.setId(id);
@@ -1151,6 +1160,10 @@ public class MapboxMap {
         Icon icon = mMapView.loadIconForMarker(marker);
         marker.setTopOffsetPixels(mMapView.getTopOffsetPixelsForIcon(icon));
         return marker;
+    }
+
+    public void setMarkerViewAdapter(@Nullable MarkerViewAdapter markerViewAdapter){
+        mMarkerViewAdapter = markerViewAdapter;
     }
 
     //
@@ -1738,6 +1751,12 @@ public class MapboxMap {
          */
         @Nullable
         View getInfoWindow(@NonNull Marker marker);
+    }
+
+    public interface MarkerViewAdapter {
+
+        @Nullable
+        MarkerView getView(@NonNull Marker marker);
     }
 
     /**

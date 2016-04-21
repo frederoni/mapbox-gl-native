@@ -16,6 +16,7 @@ public class MarkerView extends FrameLayout {
 
     private LatLng latLng;
     private Projection projection;
+    private Marker marker;
 
     private float widthOffset;
     private float heightOffset;
@@ -45,6 +46,10 @@ public class MarkerView extends FrameLayout {
 
     public void setLatLng(LatLng latLng) {
         this.latLng = latLng;
+    }
+
+    public void setMarker(Marker marker) {
+        this.marker = marker;
     }
 
     @Override
