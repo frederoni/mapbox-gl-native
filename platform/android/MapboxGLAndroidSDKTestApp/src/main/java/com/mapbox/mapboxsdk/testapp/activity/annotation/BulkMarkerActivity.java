@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -122,7 +123,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    private static class LoadBulkMarkerTask extends AsyncTask<Void, Integer, List<MarkerOptions>> {
+    private static class LoadBulkMarkerTask extends AsyncTask<Void, Integer, List<BaseMarkerOptions>> {
 
         private static final String TAG = "LoadBulkMarkerTask";
         private MapboxMap mMapboxMap;
@@ -139,8 +140,8 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         }
 
         @Override
-        protected List<MarkerOptions> doInBackground(Void... params) {
-            List<MarkerOptions> markerOptions = new ArrayList<>(mAmount);
+        protected List<BaseMarkerOptions> doInBackground(Void... params) {
+            List<BaseMarkerOptions> markerOptions = new ArrayList<>(mAmount);
             try {
                 DecimalFormat formatter = new DecimalFormat("#.#####");
                 String json = GeoParseUtil.loadStringFromAssets(mAppContext, "points.geojson");
@@ -171,7 +172,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         }
 
         @Override
-        protected void onPostExecute(List<MarkerOptions> markerOptions) {
+        protected void onPostExecute(List<BaseMarkerOptions> markerOptions) {
             super.onPostExecute(markerOptions);
             mMapboxMap.addMarkers(markerOptions);
             mProgressDialog.hide();

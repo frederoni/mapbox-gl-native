@@ -37,9 +37,7 @@ import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -621,7 +619,7 @@ public class MapboxMap {
 
     public void addMarkerView(MarkerView markerView) {
         markerView.setProjection(mProjection);
-        mMarkerViews.add(markerView);
+        //mMarkerViews.add(markerView);
         mMapView.addView(markerView);
     }
 
@@ -1221,7 +1219,7 @@ public class MapboxMap {
     }
 
     //  used by MapView
-    Map<Marker, View> getMarkerViews() {
+    LongSparseArray<View> getMarkerViews() {
         return mMarkerViews;
     }
 
