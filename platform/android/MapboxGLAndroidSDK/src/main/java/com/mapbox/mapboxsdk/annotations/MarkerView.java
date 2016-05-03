@@ -52,6 +52,10 @@ public class MarkerView extends FrameLayout {
         this.marker = marker;
     }
 
+    public Marker getMarker() {
+        return marker;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);

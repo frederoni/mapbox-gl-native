@@ -11,6 +11,7 @@ import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
@@ -36,7 +37,9 @@ import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -60,7 +63,7 @@ public class MapboxMap {
     private LongSparseArray<Annotation> mAnnotations;
 
     private List<Marker> mSelectedMarkers;
-    private List<MarkerView> mMarkerViews;
+    private LongSparseArray<View> mMarkerViews;
     private List<InfoWindow> mInfoWindows;
 
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
@@ -92,8 +95,8 @@ public class MapboxMap {
         mTrackingSettings = new TrackingSettings(mMapView, mUiSettings);
         mProjection = new Projection(mapView);
         mAnnotations = new LongSparseArray<>();
+        mMarkerViews = new LongSparseArray<>();
         mSelectedMarkers = new ArrayList<>();
-        mMarkerViews = new ArrayList<>();
         mInfoWindows = new ArrayList<>();
     }
 
@@ -616,7 +619,7 @@ public class MapboxMap {
     // Annotations
     //
 
-    public void addMarkerView(MarkerView markerView){
+    public void addMarkerView(MarkerView markerView) {
         markerView.setProjection(mProjection);
         mMarkerViews.add(markerView);
         mMapView.addView(markerView);
@@ -652,14 +655,6 @@ public class MapboxMap {
     @NonNull
     public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
         Marker marker = prepareMarker(markerOptions);
-
-        if(mMarkerViewAdapter!=null){
-            MarkerView view = mMarkerViewAdapter.getView(marker);
-            if(view!=null) {
-                mMarkerViews.add(view);
-            }
-        }
-
         long id = mMapView.addMarker(marker);
         marker.setMapboxMap(this);
         marker.setId(id);
@@ -679,11 +674,11 @@ public class MapboxMap {
      */
     @UiThread
     @NonNull
-    public List<Marker> addMarkers(@NonNull List<MarkerOptions> markerOptionsList) {
+    public List<Marker> addMarkers(@NonNull List<BaseMarkerOptions> markerOptionsList) {
         int count = markerOptionsList.size();
         List<Marker> markers = new ArrayList<>(count);
         if (count > 0) {
-            MarkerOptions markerOptions;
+            BaseMarkerOptions markerOptions;
             Marker marker;
             for (int i = 0; i < count; i++) {
                 markerOptions = markerOptionsList.get(i);
@@ -1162,8 +1157,12 @@ public class MapboxMap {
         return marker;
     }
 
-    public void setMarkerViewAdapter(@Nullable MarkerViewAdapter markerViewAdapter){
+    public void setMarkerViewAdapter(@Nullable MarkerViewAdapter markerViewAdapter) {
         mMarkerViewAdapter = markerViewAdapter;
+    }
+
+    public MarkerViewAdapter getMarkerViewAdapter() {
+        return mMarkerViewAdapter;
     }
 
     //
@@ -1222,7 +1221,7 @@ public class MapboxMap {
     }
 
     //  used by MapView
-    List<MarkerView> getMarkerViews(){
+    Map<Marker, View> getMarkerViews() {
         return mMarkerViews;
     }
 
@@ -1753,10 +1752,10 @@ public class MapboxMap {
         View getInfoWindow(@NonNull Marker marker);
     }
 
-    public interface MarkerViewAdapter {
+    public interface MarkerViewAdapter<U extends Marker> {
 
         @Nullable
-        MarkerView getView(@NonNull Marker marker);
+        View getView(@NonNull U marker, @Nullable View convertView, @NonNull ViewGroup parent);
     }
 
     /**
