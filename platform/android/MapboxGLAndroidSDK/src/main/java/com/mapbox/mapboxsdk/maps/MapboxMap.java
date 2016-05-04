@@ -631,16 +631,27 @@ public class MapboxMap {
                 public void run() {
                     View adaptedView = getMarkerViewAdapter().getView(marker, convertView, mMapView);
                     mMarkerViews.append(key, adaptedView);
-                    if(convertView==null){
+                    if (convertView == null) {
                         mMapView.addView(adaptedView);
+                    } else {
+                        convertView.setVisibility(View.VISIBLE);
                     }
                 }
             });
         }
     }
 
-    public void removeMarkerView(long id){
-        viewSimplePool.release(mMarkerViews.get(id));
+    public void removeMarkerView(long id) {
+        Marker marker = (Marker) getAnnotation(id);
+        Log.v(MapboxConstants.TAG, "REMOVING "+marker.getTitle());
+        final View convertView = mMarkerViews.get(id);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                convertView.setVisibility(View.GONE);
+            }
+        });
+        viewSimplePool.release(convertView);
         mMarkerViews.remove(id);
     }
 

@@ -489,6 +489,7 @@ public class MapView extends FrameLayout {
             LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
             long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
             LongSparseArray<View> markerViews = mMapboxMap.getMarkerViews();
+            Log.v(MapboxConstants.TAG, "Annotations in bounds: " + ids.length);
 
             final MapboxMap.MarkerViewAdapter adapter = mMapboxMap.getMarkerViewAdapter();
 
@@ -533,6 +534,12 @@ public class MapView extends FrameLayout {
 
             Log.v(MapboxConstants.TAG, "Amount of annotations: " + markerViews.size());
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Log.v(MapboxConstants.TAG,"Amount of child views "+getChildCount());
         }
     }
 
