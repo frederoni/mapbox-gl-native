@@ -25,6 +25,7 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
@@ -453,52 +454,7 @@ public class MapView extends FrameLayout {
                         }
                     }
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE) {
-                    LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
-                    long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
-                    LongSparseArray<View> markerViews = mMapboxMap.getMarkerViews();
-
-                    MapboxMap.MarkerViewAdapter adapter = mMapboxMap.getMarkerViewAdapter();
-
-                    boolean found;
-                    long key;
-
-                    // introduce new markers
-                    for (long id : ids) {
-                        found = false;
-                        for (int i = 0; i < markerViews.size(); i++) {
-                            key = markerViews.keyAt(i);
-
-                            if (id == key) {
-                                found = true;
-                            }
-                        }
-
-                        if (!found) {
-                            Log.v(MapboxConstants.TAG, "Adding " + id);
-                            if(adapter!=null) {
-                                mMapboxMap.addMarkerView(id, adapter.getView((Marker) mMapboxMap.getAnnotation(id), null, MapView.this));
-                            }
-                        } else {
-                            Log.v(MapboxConstants.TAG, "Already added " + id);
-                        }
-                    }
-
-                    // clean up out of bound markers
-                    for (int i = 0; i < markerViews.size(); i++) {
-                        found = false;
-                        key = markerViews.keyAt(i);
-                        for (long id : ids) {
-                            if (id == key) {
-                                found = true;
-                            }
-                        }
-                        if (!found) {
-                            Log.v(MapboxConstants.TAG, "Removing " + key);
-                            markerViews.remove(key);
-                        }
-                    }
-
-                    Log.v(MapboxConstants.TAG, "Amount of annotations: " + markerViews.size());
+                        new MarkerInBoundsTask().execute();
                 }
             }
         });
@@ -509,6 +465,60 @@ public class MapView extends FrameLayout {
             evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_LOAD);
             evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
             MapboxEventManager.getMapboxEventManager().pushEvent(evt);
+        }
+    }
+
+    private class MarkerInBoundsTask extends AsyncTask<Void, Void, Void>{
+        @Override
+        protected Void doInBackground(Void... params) {
+            LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
+            long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
+            LongSparseArray<View> markerViews = mMapboxMap.getMarkerViews();
+
+            MapboxMap.MarkerViewAdapter adapter = mMapboxMap.getMarkerViewAdapter();
+
+            boolean found;
+            long key;
+
+            // introduce new markers
+            for (long id : ids) {
+                found = false;
+                for (int i = 0; i < markerViews.size(); i++) {
+                    key = markerViews.keyAt(i);
+
+                    if (id == key) {
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    Log.v(MapboxConstants.TAG, "Adding " + id);
+//                            if(adapter!=null) {
+//                                mMapboxMap.addMarkerView(id, adapter.getView((Marker) mMapboxMap.getAnnotation(id), null, MapView.this));
+//                            }
+                    markerViews.append(id, null);
+                } else {
+                    Log.v(MapboxConstants.TAG, "Already added " + id);
+                }
+            }
+
+            // clean up out of bound markers
+            for (int i = 0; i < markerViews.size(); i++) {
+                found = false;
+                key = markerViews.keyAt(i);
+                for (long id : ids) {
+                    if (id == key) {
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    Log.v(MapboxConstants.TAG, "Removing " + key);
+                    markerViews.remove(key);
+                }
+            }
+
+            Log.v(MapboxConstants.TAG, "Amount of annotations: " + markerViews.size());
+            return null;
         }
     }
 
@@ -1406,10 +1416,12 @@ public class MapView extends FrameLayout {
             LongSparseArray<View> viewMarkers = mMapboxMap.getMarkerViews();
             for (int i = 0; i < viewMarkers.size(); i++) {
                 mViewHolder = viewMarkers.valueAt(i);
-                Marker marker = (Marker) mMapboxMap.getAnnotation(viewMarkers.keyAt(i));
-                PointF point = mMapboxMap.getProjection().toScreenLocation(marker.getPosition());
-                mViewHolder.setX(point.x - (mViewHolder.getMeasuredWidth() / 2));
-                mViewHolder.setY(point.y - (mViewHolder.getMeasuredHeight() / 2));
+                if (mViewHolder != null) {
+                    Marker marker = (Marker) mMapboxMap.getAnnotation(viewMarkers.keyAt(i));
+                    PointF point = mMapboxMap.getProjection().toScreenLocation(marker.getPosition());
+                    mViewHolder.setX(point.x - (mViewHolder.getMeasuredWidth() / 2));
+                    mViewHolder.setY(point.y - (mViewHolder.getMeasuredHeight() / 2));
+                }
             }
 
             for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
