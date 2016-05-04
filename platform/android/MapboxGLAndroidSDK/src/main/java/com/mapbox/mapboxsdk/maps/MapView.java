@@ -456,13 +456,13 @@ public class MapView extends FrameLayout {
                     LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
                     long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
                     LongSparseArray<View> markerViews = mMapboxMap.getMarkerViews();
-                    Log.v(MapboxConstants.TAG, "Region is changing ane we are seeing: " + ids.length + " point annotations  " + change);
 
                     MapboxMap.MarkerViewAdapter adapter = mMapboxMap.getMarkerViewAdapter();
 
                     boolean found;
                     long key;
 
+                    // introduce new markers
                     for (long id : ids) {
                         found = false;
                         for (int i = 0; i < markerViews.size(); i++) {
@@ -474,13 +474,31 @@ public class MapView extends FrameLayout {
                         }
 
                         if (!found) {
-                            Log.v(MapboxConstants.TAG,"Adding "+id);
-                            mMapboxMap.addMarkerView(id, adapter.getView((Marker) mMapboxMap.getAnnotation(id), null, MapView.this));
-                        }else{
-                            Log.v(MapboxConstants.TAG,"Already added "+id);
+                            Log.v(MapboxConstants.TAG, "Adding " + id);
+                            if(adapter!=null) {
+                                mMapboxMap.addMarkerView(id, adapter.getView((Marker) mMapboxMap.getAnnotation(id), null, MapView.this));
+                            }
+                        } else {
+                            Log.v(MapboxConstants.TAG, "Already added " + id);
                         }
-
                     }
+
+                    // clean up out of bound markers
+                    for (int i = 0; i < markerViews.size(); i++) {
+                        found = false;
+                        key = markerViews.keyAt(i);
+                        for (long id : ids) {
+                            if (id == key) {
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            Log.v(MapboxConstants.TAG, "Removing " + key);
+                            markerViews.remove(key);
+                        }
+                    }
+
+                    Log.v(MapboxConstants.TAG, "Amount of annotations: " + markerViews.size());
                 }
             }
         });
