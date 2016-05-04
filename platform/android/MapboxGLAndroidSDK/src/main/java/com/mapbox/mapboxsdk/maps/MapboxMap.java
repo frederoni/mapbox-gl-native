@@ -2,12 +2,15 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.LongSparseArray;
+import android.support.v4.util.Pools;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -84,6 +87,8 @@ public class MapboxMap {
 
     private double mMaxZoomLevel = -1;
     private double mMinZoomLevel = -1;
+
+    private Pools.SimplePool<View> viewSimplePool = new Pools.SimplePool<>(20);
 
     MapboxMap(@NonNull MapView mapView) {
         mMapView = mapView;
@@ -616,9 +621,27 @@ public class MapboxMap {
     // Annotations
     //
 
-    public void addMarkerView(long key, View markerView) {
-        mMarkerViews.append(key, markerView);
-        mMapView.addView(markerView);
+    public void addMarkerView(final long key) {
+        final Marker marker = (Marker) getAnnotation(key);
+        if (marker != null) {
+            final View convertView = viewSimplePool.acquire();
+            Log.v(MapboxConstants.TAG, "Adding " + key + " with convertView " + convertView);
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    View adaptedView = getMarkerViewAdapter().getView(marker, convertView, mMapView);
+                    mMarkerViews.append(key, adaptedView);
+                    if(convertView==null){
+                        mMapView.addView(adaptedView);
+                    }
+                }
+            });
+        }
+    }
+
+    public void removeMarkerView(long id){
+        viewSimplePool.release(mMarkerViews.get(id));
+        mMarkerViews.remove(id);
     }
 
     /**
@@ -969,7 +992,6 @@ public class MapboxMap {
      *
      * @return An annotation with a matched id, null is returned if no match was found.
      */
-    @UiThread
     @Nullable
     public Annotation getAnnotation(long id) {
         return mAnnotations.get(id);
