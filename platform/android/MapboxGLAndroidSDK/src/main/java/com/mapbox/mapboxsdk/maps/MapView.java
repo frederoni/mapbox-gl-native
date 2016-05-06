@@ -162,7 +162,8 @@ public class MapView extends FrameLayout {
     private StyleInitializer mStyleInitializer;
 
     private List<OnMapReadyCallback> mOnMapReadyCallbackList;
-    private long nViewMarkerBoundsUpdateTime;
+    private long mViewMarkerBoundsUpdateTime;
+    private boolean mViewMarkersUpdateRunning;
 
     @UiThread
     public MapView(@NonNull Context context) {
@@ -459,12 +460,11 @@ public class MapView extends FrameLayout {
 
                     long currentTime = SystemClock.elapsedRealtime();
 
-                    if (currentTime < nViewMarkerBoundsUpdateTime) {
+                    if (mViewMarkersUpdateRunning || currentTime < mViewMarkerBoundsUpdateTime) {
                         return;
                     }
-
-                    nViewMarkerBoundsUpdateTime = currentTime + 300;
-
+                    
+                    mViewMarkerBoundsUpdateTime = currentTime + 300;
                     new MarkerInBoundsTask().execute();
                 }
             }
@@ -481,6 +481,12 @@ public class MapView extends FrameLayout {
 
 
     public class MarkerInBoundsTask extends AsyncTask<Void, Void, MarkerInBoundsTask.Result> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mViewMarkersUpdateRunning = true;
+        }
 
         @Override
         protected Result doInBackground(Void... params) {
@@ -544,6 +550,7 @@ public class MapView extends FrameLayout {
         protected void onPostExecute(Result result) {
             super.onPostExecute(result);
             mMapboxMap.setViewMarkersBoundsTaskResult(result);
+            mViewMarkersUpdateRunning = false;
             Log.v(MapboxConstants.TAG, "Amount of child views " + getChildCount());
         }
 
