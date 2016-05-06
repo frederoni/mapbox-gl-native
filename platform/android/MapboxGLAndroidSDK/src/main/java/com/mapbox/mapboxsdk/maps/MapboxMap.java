@@ -641,8 +641,6 @@ public class MapboxMap {
             mMarkerViews.append(marker.getId(), adaptedView);
             if (convertView == null) {
                 mMapView.addView(adaptedView);
-            } else {
-                convertView.setVisibility(View.VISIBLE);
             }
         }
     }
