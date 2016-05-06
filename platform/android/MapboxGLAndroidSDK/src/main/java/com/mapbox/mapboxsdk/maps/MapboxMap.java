@@ -40,6 +40,7 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -621,38 +622,29 @@ public class MapboxMap {
     // Annotations
     //
 
-    public void addMarkerView(final long key) {
-        final Marker marker = (Marker) getAnnotation(key);
-        if (marker != null) {
-            final View convertView = viewSimplePool.acquire();
-            Log.v(MapboxConstants.TAG, "Adding " + key + " with convertView " + convertView);
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    View adaptedView = getMarkerViewAdapter().getView(marker, convertView, mMapView);
-                    mMarkerViews.append(key, adaptedView);
-                    if (convertView == null) {
-                        mMapView.addView(adaptedView);
-                    } else {
-                        convertView.setVisibility(View.VISIBLE);
-                    }
-                }
-            });
-        }
-    }
-
-    public void removeMarkerView(long id) {
-        Marker marker = (Marker) getAnnotation(id);
-        Log.v(MapboxConstants.TAG, "REMOVING "+marker.getTitle());
-        final View convertView = mMarkerViews.get(id);
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
+    void setViewMarkersBoundsTaskResult(MapView.MarkerInBoundsTask.Result result) {
+        Map<Marker, View> outBoundsMarker = result.getOutBounds();
+        View convertView;
+        for (Map.Entry<Marker, View> outBoundsEntry : outBoundsMarker.entrySet()) {
+            convertView = outBoundsEntry.getValue();
+            if (convertView != null) {
                 convertView.setVisibility(View.GONE);
+                viewSimplePool.release(convertView);
+                mMarkerViews.remove(outBoundsEntry.getKey().getId());
             }
-        });
-        viewSimplePool.release(convertView);
-        mMarkerViews.remove(id);
+        }
+
+        List<Marker> inBoundsMarkers = result.getInBounds();
+        for (Marker marker : inBoundsMarkers) {
+            convertView = viewSimplePool.acquire();
+            View adaptedView = mMarkerViewAdapter.getView(marker, convertView, mMapView);
+            mMarkerViews.append(marker.getId(), adaptedView);
+            if (convertView == null) {
+                mMapView.addView(adaptedView);
+            } else {
+                convertView.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     /**
