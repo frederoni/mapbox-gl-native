@@ -1470,12 +1470,14 @@ public class MapView extends FrameLayout {
                 mViewHolder = viewMarkers.valueAt(i);
                 if (mViewHolder != null) {
                     Marker marker = (Marker) mMapboxMap.getAnnotation(viewMarkers.keyAt(i));
-                    PointF point = mMapboxMap.getProjection().toScreenLocation(marker.getPosition());
-                    mViewHolder.setX(point.x - (mViewHolder.getMeasuredWidth() / 2));
-                    mViewHolder.setY(point.y - (mViewHolder.getMeasuredHeight() / 2));
+                    if(marker!=null) {
+                        PointF point = mMapboxMap.getProjection().toScreenLocation(marker.getPosition());
+                        mViewHolder.setX(point.x - (mViewHolder.getMeasuredWidth() / 2));
+                        mViewHolder.setY(point.y - (mViewHolder.getMeasuredHeight() / 2));
 
-                    if (mViewHolder.getVisibility() == View.GONE) {
-                        mViewHolder.setVisibility(View.VISIBLE);
+                        if (mViewHolder.getVisibility() == View.GONE) {
+                            mViewHolder.setVisibility(View.VISIBLE);
+                        }
                     }
                 }
             }
