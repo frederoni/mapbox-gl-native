@@ -641,9 +641,16 @@ public class MapboxMap {
                 adaptedView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
+                        if(mSelectedMarkers.contains(marker)){
+                            return;
+                        }
+
                         if(mOnMarkerViewClickListener!=null){
                             mOnMarkerViewClickListener.onMarkerClick(marker, v);
                         }
+
+                        mSelectedMarkers.add(marker);
                     }
                 });
 
