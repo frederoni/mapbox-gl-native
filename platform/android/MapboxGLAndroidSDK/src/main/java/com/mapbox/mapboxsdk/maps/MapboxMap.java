@@ -621,7 +621,7 @@ public class MapboxMap {
     // Annotations
     //
 
-    void setViewMarkersBoundsTaskResult(MapView.MarkerInBoundsTask.Result result) {
+    void setViewMarkersBoundsTaskResult(MapView.ViewMarkerInBoundsTask.Result result) {
         Map<Marker, View> outBoundsMarker = result.getOutBounds();
         View convertView;
 
@@ -1198,6 +1198,9 @@ public class MapboxMap {
 
     public void setMarkerViewAdapter(@Nullable MarkerViewAdapter markerViewAdapter) {
         mMarkerViewAdapter = markerViewAdapter;
+        if(markerViewAdapter!=null){
+            mMapView.invalidateViewMarkers();
+        }
     }
 
     public MarkerViewAdapter getMarkerViewAdapter() {
