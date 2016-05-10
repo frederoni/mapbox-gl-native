@@ -1006,6 +1006,7 @@ public class MapboxMap {
             annotation = mAnnotations.get(ids[i]);
             if (annotation instanceof Marker) {
                 ((Marker) annotation).hideInfoWindow();
+                removeMarkerView(annotation.getId());
             }
         }
         mMapView.removeAnnotations(ids);
