@@ -36,10 +36,8 @@ static double _normalizeAngle(double angle, double anchorAngle)
     return angle;
 }
 
-Transform::Transform(View &view_, ConstrainMode constrainMode)
-    : view(view_)
-    , state(constrainMode)
-{
+Transform::Transform(std::function<void(MapChange)> callback_, ConstrainMode constrainMode)
+    : callback(std::move(callback_)), state(constrainMode) {
 }
 
 #pragma mark - Map View
@@ -47,13 +45,17 @@ Transform::Transform(View &view_, ConstrainMode constrainMode)
 bool Transform::resize(const std::array<uint16_t, 2> size) {
     if (state.width != size[0] || state.height != size[1]) {
 
-        view.notifyMapChange(MapChangeRegionWillChange);
+        if (callback) {
+            callback(MapChangeRegionWillChange);
+        }
 
         state.width = size[0];
         state.height = size[1];
         state.constrain(state.scale, state.x, state.y);
 
-        view.notifyMapChange(MapChangeRegionDidChange);
+        if (callback) {
+            callback(MapChangeRegionDidChange);
+        }
 
         return true;
     } else {
@@ -566,8 +568,10 @@ void Transform::startTransition(const CameraOptions& camera,
     }
     
     bool isAnimated = duration != Duration::zero();
-    view.notifyMapChange(isAnimated ? MapChangeRegionWillChangeAnimated : MapChangeRegionWillChange);
-    
+    if (callback) {
+        callback(isAnimated ? MapChangeRegionWillChangeAnimated : MapChangeRegionWillChange);
+    }
+
     // Associate the anchor, if given, with a coordinate.
     optional<ScreenCoordinate> anchor = camera.anchor;
     LatLng anchorLatLng;
@@ -596,7 +600,9 @@ void Transform::startTransition(const CameraOptions& camera,
             if (animation.transitionFrameFn) {
                 animation.transitionFrameFn(t);
             }
-            view.notifyMapChange(MapChangeRegionIsChanging);
+            if (callback) {
+                callback(MapChangeRegionIsChanging);
+            }
         } else {
             transitionFinishFn();
             transitionFinishFn = nullptr;
@@ -615,7 +621,9 @@ void Transform::startTransition(const CameraOptions& camera,
         if (animation.transitionFinishFn) {
             animation.transitionFinishFn();
         }
-        view.notifyMapChange(isAnimated ? MapChangeRegionDidChangeAnimated : MapChangeRegionDidChange);
+        if (callback) {
+            callback(isAnimated ? MapChangeRegionDidChangeAnimated : MapChangeRegionDidChange);
+        }
     };
     
     if (!isAnimated) {

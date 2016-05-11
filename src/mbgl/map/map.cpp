@@ -85,7 +85,7 @@ Map::Map(View& view, FileSource& fileSource, MapMode mapMode, GLContextMode cont
 Map::Impl::Impl(View& view_, FileSource& fileSource_, MapMode mode_, GLContextMode contextMode_, ConstrainMode constrainMode_)
     : view(view_),
       fileSource(fileSource_),
-      transform(view, constrainMode_),
+      transform([this](MapChange change) { view.notifyMapChange(change); }, constrainMode_),
       mode(mode_),
       contextMode(contextMode_),
       pixelRatio(view.getPixelRatio()),
