@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.maps;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.SystemClock;
@@ -14,11 +13,11 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.LongSparseArray;
 import android.support.v4.util.Pools;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
@@ -640,9 +639,7 @@ public class MapboxMap {
         for (Map.Entry<Marker, View> outBoundsEntry : outBoundsMarker.entrySet()) {
             convertView = outBoundsEntry.getValue();
             if (convertView != null) {
-                convertView.setVisibility(View.GONE);
-                viewSimplePool.release(convertView);
-                mMarkerViews.remove(outBoundsEntry.getKey().getId());
+                removeMarkerView(outBoundsEntry.getKey().getId());
             }
         }
 
@@ -983,10 +980,27 @@ public class MapboxMap {
     }
 
     private void removeMarkerView(long id) {
-        View viewHolder = mMarkerViews.get(id);
+        final View viewHolder = mMarkerViews.get(id);
         if (viewHolder != null) {
-            viewHolder.setVisibility(View.GONE);
-            viewSimplePool.release(viewHolder);
+
+            // cancel ongoing animations
+            viewHolder.animate().cancel();
+            viewHolder.setAlpha(1);
+
+            // animate alpha
+            viewHolder.animate()
+                    .alpha(0)
+                    .setDuration(MapboxConstants.ANIMATION_DURATION_SHORT)
+                    .setInterpolator(new FastOutSlowInInterpolator())
+                    .setListener(new AnimatorListenerAdapter() {
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    viewHolder.setVisibility(View.GONE);
+                    viewSimplePool.release(viewHolder);
+                }
+            });
         }
         mMarkerViews.remove(id);
     }
