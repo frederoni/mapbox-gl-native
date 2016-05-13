@@ -121,6 +121,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         private LayoutInflater inflater;
 
         public TextAdapter(@NonNull Context context) {
+            super(context);
             this.inflater = LayoutInflater.from(context);
         }
 

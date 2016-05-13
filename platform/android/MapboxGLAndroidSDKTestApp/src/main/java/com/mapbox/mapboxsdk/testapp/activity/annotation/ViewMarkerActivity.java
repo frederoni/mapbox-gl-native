@@ -91,6 +91,7 @@ public class ViewMarkerActivity extends AppCompatActivity implements OnMapReadyC
         private LayoutInflater inflater;
 
         public CountryAdapter(@NonNull Context context) {
+            super(context);
             this.inflater = LayoutInflater.from(context);
         }
 
