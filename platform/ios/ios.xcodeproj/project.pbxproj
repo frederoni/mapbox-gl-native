@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3564F96B1CEFA97E00D42D5B /* MGLAnnotation_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 3564F96A1CEFA97E00D42D5B /* MGLAnnotation_Private.h */; };
 		4018B1C71CDC287F00F666AF /* MGLAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4018B1C41CDC277F00F666AF /* MGLAnnotationView.m */; };
 		4018B1C81CDC287F00F666AF /* MGLAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4018B1C41CDC277F00F666AF /* MGLAnnotationView.m */; };
 		4018B1C91CDC288A00F666AF /* MGLAnnotationView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */; };
@@ -310,6 +311,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3564F96A1CEFA97E00D42D5B /* MGLAnnotation_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLAnnotation_Private.h; path = ../../darwin/src/MGLAnnotation_Private.h; sourceTree = "<group>"; };
 		4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationView_Private.h; sourceTree = "<group>"; };
 		4018B1C41CDC277F00F666AF /* MGLAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAnnotationView.m; sourceTree = "<group>"; };
 		4018B1C51CDC277F00F666AF /* MGLAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationView.h; sourceTree = "<group>"; };
@@ -714,6 +716,7 @@
 			isa = PBXGroup;
 			children = (
 				4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */,
+				3564F96A1CEFA97E00D42D5B /* MGLAnnotation_Private.h */,
 				4018B1C41CDC277F00F666AF /* MGLAnnotationView.m */,
 				4018B1C51CDC277F00F666AF /* MGLAnnotationView.h */,
 				DA8848341CBAFB8500AB86E3 /* MGLAnnotationImage.h */,
@@ -917,6 +920,7 @@
 				DA88482F1CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.h in Headers */,
 				DA8848601CBAFC2E00AB86E3 /* Mapbox.h in Headers */,
 				DA8847F61CBAFA5100AB86E3 /* MGLOfflineStorage.h in Headers */,
+				3564F96B1CEFA97E00D42D5B /* MGLAnnotation_Private.h in Headers */,
 				DA88483C1CBAFB8500AB86E3 /* MGLMapView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

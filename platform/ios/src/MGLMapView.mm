@@ -1417,6 +1417,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if (hitAnnotationView)
     {
         [self selectAnnotation:hitAnnotationView.annotation animated:YES];
+        [self selectAnnotationView:hitAnnotationView animated:YES];
         return;
     }
     
@@ -3305,6 +3306,18 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if (MGLCoordinateInCoordinateBounds(firstAnnotation.coordinate, self.visibleCoordinateBounds))
     {
         [self selectAnnotation:firstAnnotation animated:NO];
+    }
+}
+
+- (void)selectAnnotationView:(MGLAnnotationView *)annotationView animated:(BOOL)animated
+{
+    [annotationView setSelected:YES animated:animated];
+}
+
+- (void)deselectAnnotationView:(MGLAnnotationView *)annotationView
+{
+    if (_selectedAnnotationView) {
+        _selectedAnnotationView.selected = NO;
     }
 }
 

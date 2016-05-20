@@ -2,6 +2,14 @@
 
 #import "MGLTypes.h"
 
+typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
+    MGLAnnotationViewDragStateNone = 0,
+    MGLAnnotationViewDragStateStarting,
+    MGLAnnotationViewDragStateDragging,
+    MGLAnnotationViewDragStateCanceling,
+    MGLAnnotationViewDragStateEnding
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 /** The MGLAnnotationView class is responsible for representing point-based annotation markers as a view. Annotation views represent an annotation object, which is an object that corresponds to the MGLAnnotation protocol. When an annotation’s coordinate point is visible on the map view, the map view delegate is asked to provide a corresponding annotation view. If an annotation view is created with a reuse identifier, the map view may recycle the view when it goes offscreen. */
@@ -40,6 +48,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign, getter=isFlat) BOOL flat;
 
+
+@property (nonatomic, assign, getter=isEnabled) BOOL enabled;
+@property (nonatomic, assign, getter=isSelected) BOOL selected;
+@property (nonatomic, assign, getter=isHighlighted) BOOL highlighted;
+@property (nonatomic, assign, getter=isDraggable) BOOL draggable;
+
+@property (nonatomic) MGLAnnotationViewDragState dragState;
+
+- (void)setDragState:(MGLAnnotationViewDragState)dragState animated:(BOOL)animated;
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated;
 
 /**
  Called when the view is removed from the reuse queue.

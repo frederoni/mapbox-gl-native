@@ -958,6 +958,8 @@ IB_DESIGNABLE
  */
 @property (nonatomic, copy) NS_ARRAY_OF(id <MGLAnnotation>) *selectedAnnotations;
 
+@property (nonatomic, weak) MGLAnnotationView *selectedAnnotationView;
+
 /**
  Selects an annotation and displays a callout view for it.
  
